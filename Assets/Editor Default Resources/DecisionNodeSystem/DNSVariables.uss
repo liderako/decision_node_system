@@ -1,0 +1,8 @@
+:root
+{
+    --dns-colors-grid-light-grey-1: #2d2b2b;
+    --dns-colors-grid-light-grey-2: rgba(51, 51, 51, 0.4);
+    --dns-colors-grid-light-grey-3: rgba(51, 51, 51, 1);
+    
+    --ds-metrics-grid-25: 25;
+}
