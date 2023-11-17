@@ -29,8 +29,10 @@ namespace DecisionNS.Windows
 
         private void AddStyle()
         {
-            StyleSheet styleSheet = (StyleSheet) EditorGUIUtility.Load("DecisionNodeSystem/DNSVariables.uss");
-            rootVisualElement.styleSheets.Add(styleSheet);
+            StyleSheet styleVariablesSheet = (StyleSheet) EditorGUIUtility.Load("DecisionNodeSystem/DNSVariables.uss");
+            StyleSheet styleNodeSheet = (StyleSheet) EditorGUIUtility.Load("DecisionNodeSystem/DNSNodeStyle.uss");
+            rootVisualElement.styleSheets.Add(styleVariablesSheet);
+            rootVisualElement.styleSheets.Add(styleNodeSheet);
         }
     }   
 }

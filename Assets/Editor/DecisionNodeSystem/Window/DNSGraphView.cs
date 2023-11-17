@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using DecisionNS.Elements;
 using DecisionNS.Enumerations;
 using UnityEditor;
@@ -16,6 +17,34 @@ namespace DecisionNS
             AddGridBackground();
 
             AddStyle();
+        }
+
+        public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
+        {
+            List<Port> compatiblePorts = new List<Port>();
+
+            ports.ForEach(port =>
+            {
+                if (startPort == port) // if A it's A
+                {
+                    return;
+                }
+
+                if (startPort.node == port.node) // if input == input or output == output
+                {
+                    return;
+                }
+
+                if (startPort.direction == port.direction)
+                {
+                    return;
+                }
+                
+                compatiblePorts.Add(port);
+            });
+            
+            return compatiblePorts;
+            // return base.GetCompatiblePorts(startPort, nodeAdapter);
         }
 
         private void AddManipulators()

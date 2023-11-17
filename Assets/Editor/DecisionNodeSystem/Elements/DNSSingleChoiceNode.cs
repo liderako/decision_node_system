@@ -13,7 +13,7 @@ namespace DecisionNS.Elements
 
             Type = DNSTypes.SingleChoice;
             
-            Choices.Add("Next Decision");
+            Choices.Add("Output");
         }
 
         public override void Draw()

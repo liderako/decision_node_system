@@ -25,14 +25,16 @@ namespace DecisionNS.Elements
             {
                 text = "Add"
             };
+            
+            addChoice.AddToClassList("dns_node__button");
+            
             mainContainer.Insert(1, addChoice);
             
             // note: output container
             
             foreach (var choice in Choices)
             {
-                Port choicePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi,
-                    typeof(bool));
+                Port choicePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(bool));
 
                 choicePort.portName = "";
 
@@ -40,12 +42,17 @@ namespace DecisionNS.Elements
                 {
                     text = "Delete"
                 };
+                
+                deleteChoice.AddToClassList("dns_node__button");
 
                 TextField textField = new TextField()
                 {
                     value = choice
                 };
-                
+                textField.AddToClassList("dns-node__choice-textfield");
+                textField.AddToClassList("dns-node__filename-textfield");
+                textField.AddToClassList("dns-node__textfield__hidden");
+
                 choicePort.Add(textField);
                 choicePort.Add(deleteChoice);
                 
