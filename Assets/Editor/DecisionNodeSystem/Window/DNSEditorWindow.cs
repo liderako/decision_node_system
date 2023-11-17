@@ -1,3 +1,4 @@
+using DecisionNS.Utilities;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -20,7 +21,7 @@ namespace DecisionNS.Windows
 
         private void AddGraphView()
         {
-            DNSGraphView dnsGraphView = new DNSGraphView();
+            DNSGraphView dnsGraphView = new DNSGraphView(this);
             
             dnsGraphView.StretchToParentSize();
             
@@ -29,10 +30,9 @@ namespace DecisionNS.Windows
 
         private void AddStyle()
         {
-            StyleSheet styleVariablesSheet = (StyleSheet) EditorGUIUtility.Load("DecisionNodeSystem/DNSVariables.uss");
-            StyleSheet styleNodeSheet = (StyleSheet) EditorGUIUtility.Load("DecisionNodeSystem/DNSNodeStyle.uss");
-            rootVisualElement.styleSheets.Add(styleVariablesSheet);
-            rootVisualElement.styleSheets.Add(styleNodeSheet);
+            rootVisualElement.AddStyleSheets(
+                "DecisionNodeSystem/DNSVariables.uss",
+                "DecisionNodeSystem/DNSNodeStyle.uss");
         }
     }   
 }

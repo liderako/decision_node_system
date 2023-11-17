@@ -1,4 +1,5 @@
 ﻿using DecisionNS.Enumerations;
+using DecisionNS.Utilities;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,6 +12,8 @@ namespace DecisionNS.Elements
         {
             base.Initialize(position);
 
+            DecisionName = "Multiple Decision Node";
+
             Type = DNSTypes.MultipleChoice;
             
             Choices.Add("New Choice");
@@ -21,11 +24,12 @@ namespace DecisionNS.Elements
             base.Draw();
             
             // note: main container
-            Button addChoice = new Button()
+            Button addChoice = new Button(() =>
             {
-                text = "Add"
-            };
-            
+                Port port = CreatePort("New Choice");
+                Choices.Add("New Choice");
+                outputContainer.Add(port);
+            }).Setup(title:"Add");
             addChoice.AddToClassList("dns_node__button");
             
             mainContainer.Insert(1, addChoice);
@@ -34,32 +38,27 @@ namespace DecisionNS.Elements
             
             foreach (var choice in Choices)
             {
-                Port choicePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(bool));
-
-                choicePort.portName = "";
-
-                Button deleteChoice = new Button()
-                {
-                    text = "Delete"
-                };
-                
-                deleteChoice.AddToClassList("dns_node__button");
-
-                TextField textField = new TextField()
-                {
-                    value = choice
-                };
-                textField.AddToClassList("dns-node__choice-textfield");
-                textField.AddToClassList("dns-node__filename-textfield");
-                textField.AddToClassList("dns-node__textfield__hidden");
-
-                choicePort.Add(textField);
-                choicePort.Add(deleteChoice);
-                
+                Port choicePort = CreatePort(choice);
                 outputContainer.Add(choicePort);
             }
             
             RefreshExpandedState();
+        }
+
+        private Port CreatePort(string choice)
+        {
+            Port choicePort = this.CreateOutput(Port.Capacity.Multi);
+            Button deleteChoice = new Button().Setup(title:"Delete");
+            deleteChoice.AddToClassList("dns_node__button");
+
+            TextField textField = new TextField().CreateTextField(choice);
+            textField.AddToClassList("dns-node__choice-textfield");
+            textField.AddToClassList("dns-node__filename-textfield");
+            textField.AddToClassList("dns-node__textfield__hidden");
+
+            choicePort.Add(textField);
+            choicePort.Add(deleteChoice);
+            return choicePort;
         }
     }
 }

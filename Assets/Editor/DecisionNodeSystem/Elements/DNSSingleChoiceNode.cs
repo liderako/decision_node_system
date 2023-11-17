@@ -1,4 +1,5 @@
-﻿using UnityEditor.Experimental.GraphView;
+﻿using DecisionNS.Utilities;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace DecisionNS.Elements
@@ -11,6 +12,8 @@ namespace DecisionNS.Elements
         {
             base.Initialize(position);
 
+            DecisionName = "Single Decision Node";
+            
             Type = DNSTypes.SingleChoice;
             
             Choices.Add("Output");
@@ -18,18 +21,12 @@ namespace DecisionNS.Elements
 
         public override void Draw()
         {
-            base.Draw();
+            base.Draw(); 
 
             // note: output container
-            
             foreach (var choice in Choices)
             {
-                Port choicePort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single,
-                    typeof(bool));
-
-                choicePort.portName = choice;
-                
-                outputContainer.Add(choicePort);
+                outputContainer.Add(this.CreateOutput(Port.Capacity.Single, name:choice));
             }
             
             RefreshExpandedState();

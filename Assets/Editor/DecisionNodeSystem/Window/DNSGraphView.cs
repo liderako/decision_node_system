@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using DecisionNS.Elements;
 using DecisionNS.Enumerations;
-using UnityEditor;
+using DecisionNS.Utilities;
+using DecisionNS.Windows;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,11 +12,16 @@ namespace DecisionNS
 {
     public class DNSGraphView : GraphView
     {
-        public DNSGraphView()
+        private DNSSearchWindow searchWindow;
+        private DNSEditorWindow editorWindow;
+        public DNSGraphView(DNSEditorWindow editorWindow)
         {
+            this.editorWindow = editorWindow;
+            
             AddManipulators();
             AddGridBackground();
-
+            AddSearchWindow();
+            
             AddStyle();
         }
 
@@ -44,7 +50,6 @@ namespace DecisionNS
             });
             
             return compatiblePorts;
-            // return base.GetCompatiblePorts(startPort, nodeAdapter);
         }
 
         private void AddManipulators()
@@ -53,20 +58,42 @@ namespace DecisionNS
             
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
-            this.AddManipulator(CreateNodeContextMenu( "Add Node (Single Choice)", DNSTypes.SingleChoice));
-            this.AddManipulator(CreateNodeContextMenu("Add Node (Multiple Choice)" , DNSTypes.MultipleChoice));
             this.AddManipulator(new ContentDragger());
-        }
+            
+            // this.AddManipulator(CreateNodeContextMenu( "Add Node (Single Choice)", DNSTypes.SingleChoice));
+            // this.AddManipulator(CreateNodeContextMenu("Add Node (Multiple Choice)" , DNSTypes.MultipleChoice));
 
-        private IManipulator CreateNodeContextMenu(string actionTitle, DNSTypes type)
-        {
-            ContextualMenuManipulator menuManipulator = new ContextualMenuManipulator(
-                menuEvent => menuEvent.menu.AppendAction(actionTitle, 
-                    actionEvent => AddElement(CreateNode(type, actionEvent.eventInfo.localMousePosition))));
-            return menuManipulator;
+            this.AddManipulator(CreateGroupContextMenu());
         }
         
-        private DNSNode CreateNode(DNSTypes decisionType, Vector2 position)
+        private IManipulator CreateGroupContextMenu()
+        {
+            ContextualMenuManipulator menuManipulator = new ContextualMenuManipulator(
+                menuEvent => menuEvent.menu.AppendAction("Add Group", 
+                    actionEvent => AddElement(CreateGroup("New Group",
+                        GetLocalMousePosition(actionEvent.eventInfo.localMousePosition)))));
+            return menuManipulator;
+        }
+
+        // private IManipulator CreateNodeContextMenu(string actionTitle, DNSTypes type)
+        // {
+        //     ContextualMenuManipulator menuManipulator = new ContextualMenuManipulator(
+        //         menuEvent => menuEvent.menu.AppendAction(actionTitle, 
+        //             actionEvent => AddElement(CreateNode(type, GetLocalMousePosition(actionEvent.eventInfo.localMousePosition)))));
+        //     return menuManipulator;
+        // }
+
+        public GraphElement CreateGroup(string title, Vector2 position)
+        {
+            Group group = new Group()
+            {
+                title = title,
+            };
+            group.SetPosition(new Rect(position, Vector2.zero));
+            return group;
+        }
+
+        public DNSNode CreateNode(DNSTypes decisionType, Vector2 position)
         {
             Type type = Type.GetType($"DecisionNS.Elements.DNS{decisionType}Node");
 
@@ -85,8 +112,32 @@ namespace DecisionNS
 
         private void AddStyle()
         {
-            StyleSheet styleSheet = (StyleSheet) EditorGUIUtility.Load("DecisionNodeSystem/DNSGraphViewStyle.uss");
-            styleSheets.Add(styleSheet);
+            this.AddStyleSheets("DecisionNodeSystem/DNSGraphViewStyle.uss", "DecisionNodeSystem/DNSNodeStyle.uss");
+        }
+        
+        private void AddSearchWindow()
+        {
+            if (searchWindow == null)
+            {
+                searchWindow = ScriptableObject.CreateInstance<DNSSearchWindow>();
+                searchWindow.Initialize(this);
+            }
+
+            nodeCreationRequest = context => SearchWindow.Open(new SearchWindowContext(GetLocalMousePosition(context.screenMousePosition)), searchWindow);
+        }
+        
+        public Vector2 GetLocalMousePosition(Vector2 mousePosition, bool isSearchWindow = false)
+        {
+            Vector2 worldMousePosition = mousePosition;
+
+            if (isSearchWindow)
+            {
+                worldMousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, mousePosition - editorWindow.position.position);
+            }
+
+            Vector2 localMousePosition = contentViewContainer.WorldToLocal(worldMousePosition);
+
+            return localMousePosition;
         }
     }
 }

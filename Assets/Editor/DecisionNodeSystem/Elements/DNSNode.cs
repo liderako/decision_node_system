@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DecisionNS.Utilities;
 using RMGames;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
@@ -20,7 +21,7 @@ namespace DecisionNS.Elements
 
         public virtual void Initialize(Vector2 position)
         {
-            DecisionName = "DecisionName";
+            DecisionName = "BaseNode";
             Choices = new List<string>();
             Text = "Decision text";
             
@@ -33,10 +34,7 @@ namespace DecisionNS.Elements
         public virtual void Draw()
         {
             // note: title container
-            TextField decisionNameTextField = new TextField()
-            {
-                value = DecisionName
-            };
+            TextField decisionNameTextField = new TextField().CreateTextField(DecisionName);
 
             decisionNameTextField.AddToClassList("dns-node__textfield");
             decisionNameTextField.AddToClassList("dns-node__filename-textfield");
@@ -45,9 +43,7 @@ namespace DecisionNS.Elements
             titleContainer.Insert(0, decisionNameTextField);
 
             // note: input
-            Port inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
-            inputPort.portName = "Input";
-            
+            Port inputPort = this.CreateInput(Port.Capacity.Multi);
             inputContainer.Add(inputPort);
 
             // note extensions container
@@ -55,19 +51,13 @@ namespace DecisionNS.Elements
             VisualElement customDataContainer = new VisualElement();
             
             customDataContainer.AddToClassList("dns-node__custom-data-container");
-            
-            Foldout textFoldout = new Foldout()
-            {
-                text = "Decision Text"
-            };
 
-            TextField textField = new TextField()
-            {
-                value = Text
-            };
-            textField.AddToClassList("dns-node__textfield");
-            textField.AddToClassList("dns-node__filename-textfield");
-            textField.AddToClassList("dns-node__textfield__hidden");
+            Foldout textFoldout = new Foldout().CreateFoldout("Decision Text");
+
+            TextField textArea = new TextField().CreateTextArea(Text);
+            textArea.AddToClassList("dns-node__textfield");
+            textArea.AddToClassList("dns-node__filename-textfield");
+            textArea.AddToClassList("dns-node__textfield__hidden");
             
             ObjectField scriptableObjectField = new ObjectField("ScriptableObject")
             {
@@ -76,7 +66,7 @@ namespace DecisionNS.Elements
                 value = TestSo
             };
             
-            textFoldout.Add(textField);
+            textFoldout.Add(textArea);
             customDataContainer.Add(textFoldout);
             customDataContainer.Add(scriptableObjectField);
 

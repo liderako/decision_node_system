@@ -1,4 +1,4 @@
-﻿namespace RMGames
+﻿namespace DecisionNS.Utilities
 {
     public static class TextUtility
     {
