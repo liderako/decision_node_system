@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using DecisionNS.Data.Save;
 using DecisionNS.Utilities;
-using RMGames;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,17 +12,27 @@ namespace DecisionNS.Elements
     
     public class DNSNode : Node
     {
+        public Int64 Id;
         public string DecisionName { get; set; }
-        public List<string> Choices { get; set; }
+        public List<DNSChoiceSaveData> Choices { get; set; }
         public string Text { get; set; }
         public DNSTypes Type { get; set; }
 
-        public ScriptableObject TestSo;
+        protected DNSGraphView graphView;
+        
+        private StyleColor originBackgroundColor;
 
-        public virtual void Initialize(Vector2 position)
+        // public ScriptableObject TestSo;
+
+        public virtual void Initialize(int id, Vector2 position, DNSGraphView graph)
         {
+            Id = id;
+            originBackgroundColor = mainContainer.style.backgroundColor;
+
+            graphView = graph;
+            
             DecisionName = "BaseNode";
-            Choices = new List<string>();
+            Choices = new List<DNSChoiceSaveData>();
             Text = "Decision text";
             
             SetPosition(new Rect(position, Vector2.zero));
@@ -35,12 +45,25 @@ namespace DecisionNS.Elements
         {
             // note: title container
             TextField decisionNameTextField = new TextField().CreateTextField(DecisionName);
-
+            decisionNameTextField.isReadOnly = true;
+            decisionNameTextField.focusable = false;
             decisionNameTextField.AddToClassList("dns-node__textfield");
             decisionNameTextField.AddToClassList("dns-node__filename-textfield");
             decisionNameTextField.AddToClassList("dns-node__textfield__hidden");
             
+            TextField idTextField = new TextField().CreateTextField(Id.ToString(), callback =>
+            {
+                graphView.RemoveUngroupedNode(this);
+
+                Id = Int32.Parse(callback.newValue);
+
+                graphView.AddUngroupedNode(this);
+            });
+            idTextField.AddToClassList("dns-node__id-textfield");
+            idTextField.AddToClassList("dns-node__textfield__hidden");
+
             titleContainer.Insert(0, decisionNameTextField);
+            titleContainer.Insert(1, idTextField);
 
             // note: input
             Port inputPort = this.CreateInput(Port.Capacity.Multi);
@@ -59,18 +82,28 @@ namespace DecisionNS.Elements
             textArea.AddToClassList("dns-node__filename-textfield");
             textArea.AddToClassList("dns-node__textfield__hidden");
             
-            ObjectField scriptableObjectField = new ObjectField("ScriptableObject")
-            {
-                objectType = typeof(ScriptableObject),
-                allowSceneObjects = false,
-                value = TestSo
-            };
+            // ObjectField scriptableObjectField = new ObjectField("ScriptableObject")
+            // {
+            //     objectType = typeof(ScriptableObject),
+            //     allowSceneObjects = false,
+            //     value = TestSo
+            // };
             
             textFoldout.Add(textArea);
             customDataContainer.Add(textFoldout);
-            customDataContainer.Add(scriptableObjectField);
+            // customDataContainer.Add(scriptableObjectField);
 
             extensionContainer.Add(customDataContainer);
+        }
+
+        public void SetErrorStyle(Color color)
+        {
+            mainContainer.style.backgroundColor = color;
+        }
+
+        public void ResetStyle()
+        {
+            mainContainer.style.backgroundColor = originBackgroundColor;
         }
     }
 }

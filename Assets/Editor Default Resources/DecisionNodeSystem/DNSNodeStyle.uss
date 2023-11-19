@@ -44,6 +44,13 @@
     border-color: var(--dns-colors-window-dark-grey-6);
 }
 
+.dns-node__id-textfield > .unity-text-field__input
+{
+    background-color: transparent;
+    border-color:transparent;
+    color: #777777;
+}
+
 .dns-node__filename-textfield > .unity-text-field__input
 {
     max-width: var(--dns-metrics-window-pixels-1000);

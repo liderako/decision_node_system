@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DecisionNS.Data.Error;
 using DecisionNS.Elements;
 using DecisionNS.Enumerations;
 using DecisionNS.Utilities;
@@ -14,14 +15,25 @@ namespace DecisionNS
     {
         private DNSSearchWindow searchWindow;
         private DNSEditorWindow editorWindow;
+
+        private SerializableDictionary<Int64, DNSNodeErrorData> ungroupsNodes;
+        private int IndexError;
+
+        public delegate void OnValueIndexError(int indexError);
+
+        public OnValueIndexError onValueIndexError;
+
         public DNSGraphView(DNSEditorWindow editorWindow)
         {
             this.editorWindow = editorWindow;
-            
+
+            ungroupsNodes = new SerializableDictionary<Int64, DNSNodeErrorData>();
+
             AddManipulators();
             AddGridBackground();
             AddSearchWindow();
-            
+
+            OnElementsDeleted();
             AddStyle();
         }
 
@@ -59,38 +71,6 @@ namespace DecisionNS
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
             this.AddManipulator(new ContentDragger());
-            
-            // this.AddManipulator(CreateNodeContextMenu( "Add Node (Single Choice)", DNSTypes.SingleChoice));
-            // this.AddManipulator(CreateNodeContextMenu("Add Node (Multiple Choice)" , DNSTypes.MultipleChoice));
-
-            this.AddManipulator(CreateGroupContextMenu());
-        }
-        
-        private IManipulator CreateGroupContextMenu()
-        {
-            ContextualMenuManipulator menuManipulator = new ContextualMenuManipulator(
-                menuEvent => menuEvent.menu.AppendAction("Add Group", 
-                    actionEvent => AddElement(CreateGroup("New Group",
-                        GetLocalMousePosition(actionEvent.eventInfo.localMousePosition)))));
-            return menuManipulator;
-        }
-
-        // private IManipulator CreateNodeContextMenu(string actionTitle, DNSTypes type)
-        // {
-        //     ContextualMenuManipulator menuManipulator = new ContextualMenuManipulator(
-        //         menuEvent => menuEvent.menu.AppendAction(actionTitle, 
-        //             actionEvent => AddElement(CreateNode(type, GetLocalMousePosition(actionEvent.eventInfo.localMousePosition)))));
-        //     return menuManipulator;
-        // }
-
-        public GraphElement CreateGroup(string title, Vector2 position)
-        {
-            Group group = new Group()
-            {
-                title = title,
-            };
-            group.SetPosition(new Rect(position, Vector2.zero));
-            return group;
         }
 
         public DNSNode CreateNode(DNSTypes decisionType, Vector2 position)
@@ -98,8 +78,11 @@ namespace DecisionNS
             Type type = Type.GetType($"DecisionNS.Elements.DNS{decisionType}Node");
 
             DNSNode node = (DNSNode)Activator.CreateInstance(type);
-            node.Initialize(position);
+            node.Initialize(node.GetHashCode(), position, this);
             node.Draw();
+
+            AddUngroupedNode(node);
+            
             return node;
         }
 
@@ -124,6 +107,76 @@ namespace DecisionNS
             }
 
             nodeCreationRequest = context => SearchWindow.Open(new SearchWindowContext(GetLocalMousePosition(context.screenMousePosition)), searchWindow);
+        }
+
+        private void OnElementsDeleted()
+        {
+            deleteSelection = (operationName, askUser) =>
+            {
+                List<DNSNode> nodesToDelete = new List<DNSNode>();
+                foreach (GraphElement element in selection)
+                {
+                    if (element is DNSNode)
+                    {
+                        nodesToDelete.Add((DNSNode)element);
+                    }
+                }
+
+                for (int i = 0; i < nodesToDelete.Count; i++)
+                {
+                    RemoveUngroupedNode(nodesToDelete[i]);
+                    RemoveElement(nodesToDelete[i]);
+                }
+            };
+        }
+        
+        public void AddUngroupedNode(DNSNode node)
+        {
+            Int64 id = node.Id;
+            if (!ungroupsNodes.ContainsKey(id))
+            {
+                DNSNodeErrorData nodeErrorData = new DNSNodeErrorData();
+                nodeErrorData.Nodes.Add(node);
+                ungroupsNodes.Add(id, nodeErrorData);
+                return;
+            }
+            
+            ungroupsNodes[id].Nodes.Add(node);
+            
+            node.SetErrorStyle(DNSErrorData.Color);
+
+            if (ungroupsNodes[id].Nodes.Count >= 2)
+            {
+                ungroupsNodes[id].Nodes[0].SetErrorStyle(DNSErrorData.Color);
+                IndexError++;
+            }
+            onValueIndexError(IndexError);
+        }
+        
+        public void RemoveUngroupedNode(DNSNode n)
+        {
+            if (ungroupsNodes.ContainsKey(n.Id))
+            {
+                ungroupsNodes[n.Id].Nodes.Remove(n);
+                n.ResetStyle();
+
+                if (ungroupsNodes[n.Id].Nodes.Count >= 1)
+                {
+                    ungroupsNodes[n.Id].Nodes[0].ResetStyle();
+                    IndexError--;
+                }
+
+                if (ungroupsNodes[n.Id].Nodes.Count == 0)
+                {
+                    ungroupsNodes.Remove(n.Id);
+                }
+                
+                if (IndexError <= 0)
+                {
+                    IndexError = 0;
+                }
+                onValueIndexError(IndexError);
+            }
         }
         
         public Vector2 GetLocalMousePosition(Vector2 mousePosition, bool isSearchWindow = false)

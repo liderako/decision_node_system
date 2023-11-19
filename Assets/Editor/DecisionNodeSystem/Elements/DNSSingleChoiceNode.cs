@@ -1,4 +1,5 @@
-﻿using DecisionNS.Utilities;
+﻿using DecisionNS.Data.Save;
+using DecisionNS.Utilities;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -8,15 +9,15 @@ namespace DecisionNS.Elements
     
     public class DNSSingleChoiceNode : DNSNode
     {
-        public override void Initialize(Vector2 position)
+        public override void Initialize(int id, Vector2 position, DNSGraphView graph)
         {
-            base.Initialize(position);
+            base.Initialize(id, position, graph);
 
             DecisionName = "Single Decision Node";
             
             Type = DNSTypes.SingleChoice;
             
-            Choices.Add("Output");
+            Choices.Add(new DNSChoiceSaveData() { Text = "Output" });
         }
 
         public override void Draw()
@@ -26,7 +27,7 @@ namespace DecisionNS.Elements
             // note: output container
             foreach (var choice in Choices)
             {
-                outputContainer.Add(this.CreateOutput(Port.Capacity.Single, name:choice));
+                outputContainer.Add(this.CreateOutput(Port.Capacity.Single, name:choice.Text));
             }
             
             RefreshExpandedState();

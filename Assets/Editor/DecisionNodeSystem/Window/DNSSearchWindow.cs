@@ -64,11 +64,6 @@ namespace DecisionNS.Windows
                         position:localMousePosition));
                     return true;
                 }
-                case Group _:
-                {
-                    graphView.AddElement(graphView.CreateGroup("New Group", context.screenMousePosition));
-                    return true;
-                }
             }
             return false;
         }

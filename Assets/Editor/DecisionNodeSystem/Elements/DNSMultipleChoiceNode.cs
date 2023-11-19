@@ -1,4 +1,5 @@
-﻿using DecisionNS.Enumerations;
+﻿using DecisionNS.Data.Save;
+using DecisionNS.Enumerations;
 using DecisionNS.Utilities;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -8,15 +9,18 @@ namespace DecisionNS.Elements
 {
     public class DNSMultipleChoiceNode : DNSNode
     {
-        public override void Initialize(Vector2 position)
+        private DNSGraphView dsGraphView;
+        public override void Initialize(int id, Vector2 position, DNSGraphView dsGraphView)
         {
-            base.Initialize(position);
+            base.Initialize(id, position, dsGraphView);
 
             DecisionName = "Multiple Decision Node";
 
             Type = DNSTypes.MultipleChoice;
-            
-            Choices.Add("New Choice");
+
+            Choices.Add(new DNSChoiceSaveData() { Text = "New Choice" });
+
+            this.GetHashCode();
         }
 
         public override void Draw()
@@ -26,8 +30,9 @@ namespace DecisionNS.Elements
             // note: main container
             Button addChoice = new Button(() =>
             {
-                Port port = CreatePort("New Choice");
-                Choices.Add("New Choice");
+                var userdata = new DNSChoiceSaveData() { Text = "New Choice" };
+                Choices.Add(userdata);
+                Port port = CreatePort(userdata);
                 outputContainer.Add(port);
             }).Setup(title:"Add");
             addChoice.AddToClassList("dns_node__button");
@@ -45,13 +50,35 @@ namespace DecisionNS.Elements
             RefreshExpandedState();
         }
 
-        private Port CreatePort(string choice)
+        private Port CreatePort(object userData)
         {
             Port choicePort = this.CreateOutput(Port.Capacity.Multi);
-            Button deleteChoice = new Button().Setup(title:"Delete");
+            choicePort.userData = userData;
+            
+            DNSChoiceSaveData choiceData = (DNSChoiceSaveData) userData;            
+            
+            Button deleteChoice = new Button((() =>
+            {
+                if (Choices.Count == 1)
+                {
+                    return;
+                }
+                if (choicePort.connected)
+                {
+                    graphView.DeleteElements(choicePort.connections);
+                }
+                Choices.Remove(choiceData);
+                graphView.RemoveElement(choicePort);
+            })).Setup(title:"Delete");
+            
             deleteChoice.AddToClassList("dns_node__button");
 
-            TextField textField = new TextField().CreateTextField(choice);
+            
+            TextField textField = new TextField().CreateTextField(choiceData.Text, callback =>
+            {
+                choiceData.Text = callback.newValue;
+            });
+            
             textField.AddToClassList("dns-node__choice-textfield");
             textField.AddToClassList("dns-node__filename-textfield");
             textField.AddToClassList("dns-node__textfield__hidden");
