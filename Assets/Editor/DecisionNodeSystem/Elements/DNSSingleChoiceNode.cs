@@ -7,8 +7,10 @@ namespace DecisionNS.Elements
 {
     using Enumerations;
     
+    [System.Serializable]
     public class DNSSingleChoiceNode : DNSNode
     {
+        public bool IsNps = true;
         public override void Initialize(int id, Vector2 position, DNSGraphView graph)
         {
             base.Initialize(id, position, graph);
@@ -31,6 +33,12 @@ namespace DecisionNS.Elements
             }
             
             RefreshExpandedState();
+        }
+        
+        public override void Log()
+        {
+            base.Log();
+            Debug.Log("IsNPC: " + IsNps);
         }
     }
 }

@@ -10,13 +10,14 @@ namespace DecisionNS.Elements
 {
     using Enumerations;
     
+    [System.Serializable]
     public class DNSNode : Node
     {
         public Int64 Id;
-        public string DecisionName { get; set; }
-        public List<DNSChoiceSaveData> Choices { get; set; }
-        public string Text { get; set; }
-        public DNSTypes Type { get; set; }
+        [field:SerializeField] public string DecisionName { get; set; }
+        [field:SerializeField] public List<DNSChoiceSaveData> Choices { get; set; }
+        [field:SerializeField] public string Text { get; set; }
+        [field:SerializeField] public DNSTypes Type { get; set; }
 
         protected DNSGraphView graphView;
         
@@ -104,6 +105,13 @@ namespace DecisionNS.Elements
         public void ResetStyle()
         {
             mainContainer.style.backgroundColor = originBackgroundColor;
+        }
+
+        public virtual void Log()
+        {
+            Debug.Log("ID :" + Id);
+            Debug.Log("TYPE: " + DecisionName);
+            Debug.Log("TYPE2: " + Type);
         }
     }
 }

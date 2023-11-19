@@ -1,4 +1,8 @@
+using System.Collections.Generic;
+using System.Net;
+using DecisionNS.Elements;
 using DecisionNS.Utilities;
+using NUnit.Framework;
 using PlasticGui;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -83,6 +87,8 @@ namespace DecisionNS.Windows
             };
             toolbar.Add(saveButton);
         }
+        
+        private List<DNSNode> nodes;
 
         private void SaveGraph()
         {
@@ -90,6 +96,32 @@ namespace DecisionNS.Windows
             {
                 EditorUtility.DisplayDialog("Invalid file name.", "Please ensure the file name you've typed in is valid.", "Fine!");
                 return;
+            }
+
+            nodes = new List<DNSNode>();
+
+            graphView.graphElements.ForEach(graphElement =>
+            {
+                if (graphElement is DNSNode node)
+                {
+                    nodes.Add(node);
+                }
+            });
+
+            GraphData graphData = new GraphData(nodes);
+            string json = JsonUtility.ToJson(graphData);
+            Debug.Log(json);
+            Load(json);
+        }
+        
+        private void Load(string json)
+        {
+            GraphData graphData = JsonUtility.FromJson<GraphData>(json);   
+            List<DNSNode> nodes2 = graphData.Nodes;
+
+            foreach (var node in nodes2)
+            {
+                node.Log();
             }
         }
         
@@ -115,5 +147,20 @@ namespace DecisionNS.Windows
                 "DecisionNodeSystem/DNSVariables.uss",
                 "DecisionNodeSystem/DNSNodeStyle.uss");
         }
-    }   
+    }
+    
+    [System.Serializable]
+    public class GraphData
+    {
+        [SerializeField]
+        [SerializeReference]
+        private List<DNSNode> nodes;
+
+        public GraphData(List<DNSNode> nodes)
+        {
+            this.nodes = nodes;
+        }
+
+        public List<DNSNode> Nodes => nodes;
+    }
 }

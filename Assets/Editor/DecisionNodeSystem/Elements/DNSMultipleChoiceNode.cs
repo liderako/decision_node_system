@@ -7,8 +7,11 @@ using UnityEngine.UIElements;
 
 namespace DecisionNS.Elements
 {
+    [System.Serializable]
     public class DNSMultipleChoiceNode : DNSNode
     {
+        public int some = 5;
+        
         private DNSGraphView dsGraphView;
         public override void Initialize(int id, Vector2 position, DNSGraphView dsGraphView)
         {
@@ -86,6 +89,12 @@ namespace DecisionNS.Elements
             choicePort.Add(textField);
             choicePort.Add(deleteChoice);
             return choicePort;
+        }
+        
+        public override void Log()
+        {
+            base.Log();
+            Debug.Log("some: " + some);
         }
     }
 }
