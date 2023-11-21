@@ -1,12 +1,9 @@
-using System.Collections.Generic;
-using System.Net;
-using DecisionNS.Elements;
+using System.IO;
+using DecisionNS.Editor.DecisionNodeSystem.Data.ScriptableObjects;
+using DecisionNS.Editor.Memento;
 using DecisionNS.Utilities;
-using NUnit.Framework;
-using PlasticGui;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace DecisionNS.Windows
@@ -15,21 +12,33 @@ namespace DecisionNS.Windows
     {
         private readonly string DefaultFileName = "DecisionFileName";
         private DNSGraphView graphView;
+        private MementoGraph mementoGraph;
 
         private TextField fileNameTextField;
-        
+
+        public DNSContainer dnsContainer;
+
         [MenuItem("Window/DecisionNS/Decision Graph")]
         public static void ShowExample()
         {
             GetWindow<DNSEditorWindow>("Decision Graph");
         }
 
+        public static void OpenWindow(DNSContainer dnsContainerInput)
+        {
+            var w = GetWindow<DNSEditorWindow>("Decision Graph");
+            var copyContainer = Instantiate(dnsContainerInput);
+            copyContainer.name = dnsContainerInput.name;
+            w.LoadGraph(copyContainer);
+            w.dnsContainer = copyContainer;
+        }
+
         private void OnEnable()
         {
             AddGraphView();
             AddToolbar();
-            
             AddStyle();
+            mementoGraph = new MementoGraph(graphView, DefaultFileName);
         }
 
         private void AddGraphView()
@@ -51,8 +60,24 @@ namespace DecisionNS.Windows
 
             AddSaveButton(toolbar);
             AddLoadButton(toolbar);
+            AddResetButton(toolbar);
             
             rootVisualElement.Add(toolbar);
+        }
+
+        private void AddResetButton(Toolbar toolbar)
+        {
+            Button reset = new Button(() =>
+            {
+                if (dnsContainer != null)
+                {
+                    LoadGraph(dnsContainer);
+                }
+            })
+            {
+                text = "Reset"
+            };
+            toolbar.Add(reset);
         }
 
         private void AddLoadButton(Toolbar toolbar)
@@ -87,8 +112,6 @@ namespace DecisionNS.Windows
             };
             toolbar.Add(saveButton);
         }
-        
-        private List<DNSNode> nodes;
 
         private void SaveGraph()
         {
@@ -97,48 +120,32 @@ namespace DecisionNS.Windows
                 EditorUtility.DisplayDialog("Invalid file name.", "Please ensure the file name you've typed in is valid.", "Fine!");
                 return;
             }
+            mementoGraph.Save(fileNameTextField.value, graphView.GetNodesForSave());
+        }
 
-            nodes = new List<DNSNode>();
-
-            graphView.graphElements.ForEach(graphElement =>
+        private void LoadGraph(DNSContainer container=null)
+        {
+            string fileName;
+            if (container == null)
             {
-                if (graphElement is DNSNode node)
+                string filePath = EditorUtility.OpenFilePanel("Dialogue Graphs", "Assets/", "asset");
+
+                if (string.IsNullOrEmpty(filePath))
                 {
-                    nodes.Add(node);
+                    return;
                 }
-            });
-
-            GraphData graphData = new GraphData(nodes);
-            string json = JsonUtility.ToJson(graphData);
-            Debug.Log(json);
-            Load(json);
-        }
-        
-        private void Load(string json)
-        {
-            GraphData graphData = JsonUtility.FromJson<GraphData>(json);   
-            List<DNSNode> nodes2 = graphData.Nodes;
-
-            foreach (var node in nodes2)
-            {
-                node.Log();
+                fileName = Path.GetFileNameWithoutExtension(filePath);
             }
-        }
-        
-        private void LoadGraph()
-        {
-            string filePath = EditorUtility.OpenFilePanel("Dialogue Graphs", "Assets/Editor/DialogueSystem/Graphs", "asset");
-
-            if (string.IsNullOrEmpty(filePath))
+            else
             {
-                return;
+                fileName = container.name;
             }
-            // note: we need to clear graph before load anything.
-            graphView.Clear();
-
-            // todo load data in graph 
-            // DSIOUtility.Initialize(graphView, Path.GetFileNameWithoutExtension(filePath));
-            // DSIOUtility.Load();
+            graphView.ClearGraph();
+            mementoGraph = new MementoGraph(graphView, fileName);
+            if (mementoGraph.Load())
+            {
+                fileNameTextField.value = fileName;
+            }
         }
 
         private void AddStyle()
@@ -147,20 +154,5 @@ namespace DecisionNS.Windows
                 "DecisionNodeSystem/DNSVariables.uss",
                 "DecisionNodeSystem/DNSNodeStyle.uss");
         }
-    }
-    
-    [System.Serializable]
-    public class GraphData
-    {
-        [SerializeField]
-        [SerializeReference]
-        private List<DNSNode> nodes;
-
-        public GraphData(List<DNSNode> nodes)
-        {
-            this.nodes = nodes;
-        }
-
-        public List<DNSNode> Nodes => nodes;
     }
 }

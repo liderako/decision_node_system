@@ -2,7 +2,9 @@
 {
     public enum DNSTypes
     {
-        SingleChoice,
-        MultipleChoice
+        Decision,
+        MultipleChoice,
+        Event,
+        Condition
     }
 }

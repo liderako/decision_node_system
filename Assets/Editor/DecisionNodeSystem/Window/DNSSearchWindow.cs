@@ -27,19 +27,8 @@ namespace DecisionNS.Windows
                 new SearchTreeEntry(new GUIContent("Single Decision", indentationIcon))
                 {
                     level = 2,
-                    userData = DNSTypes.SingleChoice
+                    userData = DNSTypes.Decision
                 },
-                new SearchTreeEntry(new GUIContent("Multiple Decision", indentationIcon))
-                {
-                    level = 2,
-                    userData = DNSTypes.MultipleChoice
-                },
-                new SearchTreeGroupEntry(new GUIContent("Create Group"), 1),
-                new SearchTreeEntry(new GUIContent("Single Group", indentationIcon))
-                {
-                    level = 2,
-                    userData = new Group()
-                }
             };
                 
             return searchTreeEntries;
@@ -50,18 +39,11 @@ namespace DecisionNS.Windows
             var localMousePosition = graphView.GetLocalMousePosition(context.screenMousePosition, true);
             switch (SearchTreeEntry.userData)
             {
-                case DNSTypes.SingleChoice:
+                case DNSTypes.Decision:
                 {
                     graphView.AddElement(graphView.CreateNode(
-                        DNSTypes.SingleChoice,
+                        DNSTypes.Decision,
                        position:localMousePosition));
-                    return true;
-                }
-                case DNSTypes.MultipleChoice:
-                {
-                    graphView.AddElement(graphView.CreateNode(
-                        DNSTypes.MultipleChoice,
-                        position:localMousePosition));
                     return true;
                 }
             }

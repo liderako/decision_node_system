@@ -10,20 +10,23 @@ namespace DecisionNS.Elements
 {
     using Enumerations;
     
-    [System.Serializable]
-    public class DNSNode : Node
+    public abstract class DNSNode : Node
     {
-        public Int64 Id;
-        [field:SerializeField] public string DecisionName { get; set; }
-        [field:SerializeField] public List<DNSChoiceSaveData> Choices { get; set; }
-        [field:SerializeField] public string Text { get; set; }
-        [field:SerializeField] public DNSTypes Type { get; set; }
+        public Int64 Id { get; set; }
+        public string NodeName { get; set; }
+
+        public string Text;
+        
+        public List<DNSChoiceSaveData> Choices { get; set; }
+        public DNSTypes Type { get; set; }
 
         protected DNSGraphView graphView;
         
         private StyleColor originBackgroundColor;
+        protected VisualElement CustomDataContainer { get; set; }
 
-        // public ScriptableObject TestSo;
+        protected TextField textArea;
+
 
         public virtual void Initialize(int id, Vector2 position, DNSGraphView graph)
         {
@@ -32,10 +35,9 @@ namespace DecisionNS.Elements
 
             graphView = graph;
             
-            DecisionName = "BaseNode";
+            NodeName = "BaseNode";
             Choices = new List<DNSChoiceSaveData>();
-            Text = "Decision text";
-            
+
             SetPosition(new Rect(position, Vector2.zero));
             
             extensionContainer.AddToClassList("dns-node__extension-container");
@@ -44,8 +46,14 @@ namespace DecisionNS.Elements
 
         public virtual void Draw()
         {
-            // note: title container
-            TextField decisionNameTextField = new TextField().CreateTextField(DecisionName);
+            TitleContainerSetup();
+            InputPortSetup();
+            ExtensionsContainer();
+        }
+
+        private void TitleContainerSetup()
+        {
+            TextField decisionNameTextField = new TextField().CreateTextField(NodeName);
             decisionNameTextField.isReadOnly = true;
             decisionNameTextField.focusable = false;
             decisionNameTextField.AddToClassList("dns-node__textfield");
@@ -64,39 +72,34 @@ namespace DecisionNS.Elements
             idTextField.AddToClassList("dns-node__textfield__hidden");
 
             titleContainer.Insert(0, decisionNameTextField);
-            titleContainer.Insert(1, idTextField);
+            titleContainer.Insert(1, idTextField);   
+        }
 
-            // note: input
+        private void InputPortSetup()
+        {
             Port inputPort = this.CreateInput(Port.Capacity.Multi);
             inputContainer.Add(inputPort);
-
-            // note extensions container
-
-            VisualElement customDataContainer = new VisualElement();
-            
-            customDataContainer.AddToClassList("dns-node__custom-data-container");
+        }
+        
+        private void ExtensionsContainer()
+        {
+            CustomDataContainer = new VisualElement();
+            CustomDataContainer.AddToClassList("dns-node__custom-data-container");
 
             Foldout textFoldout = new Foldout().CreateFoldout("Decision Text");
 
-            TextField textArea = new TextField().CreateTextArea(Text);
+            textArea = new TextField().CreateTextArea("Decision text");
             textArea.AddToClassList("dns-node__textfield");
             textArea.AddToClassList("dns-node__filename-textfield");
             textArea.AddToClassList("dns-node__textfield__hidden");
-            
-            // ObjectField scriptableObjectField = new ObjectField("ScriptableObject")
-            // {
-            //     objectType = typeof(ScriptableObject),
-            //     allowSceneObjects = false,
-            //     value = TestSo
-            // };
-            
+            textArea.value = Text;
+
             textFoldout.Add(textArea);
-            customDataContainer.Add(textFoldout);
-            // customDataContainer.Add(scriptableObjectField);
+            CustomDataContainer.Add(textFoldout);
 
-            extensionContainer.Add(customDataContainer);
+            extensionContainer.Add(CustomDataContainer);
         }
-
+        
         public void SetErrorStyle(Color color)
         {
             mainContainer.style.backgroundColor = color;
@@ -107,11 +110,74 @@ namespace DecisionNS.Elements
             mainContainer.style.backgroundColor = originBackgroundColor;
         }
 
-        public virtual void Log()
+        public virtual DNode GetSaveData(DNode node=null)
         {
-            Debug.Log("ID :" + Id);
-            Debug.Log("TYPE: " + DecisionName);
-            Debug.Log("TYPE2: " + Type);
+            if (node == null)
+            {
+                node = new DNode();
+                node.Fill(Id, Type, textArea.value, GetPosition().position);
+                // node.Choices = Choices;
+            }
+            else
+            {
+                node.Fill(Id, Type, textArea.value, GetPosition().position);
+                List<DNSChoiceSaveData> choiceSaveData = new List<DNSChoiceSaveData>();
+                foreach (Port port in outputContainer.Children())
+                {
+                    foreach (var edge in port.connections)
+                    {
+                        DNSNode nextNode = (DNSNode) edge.input.node;
+
+                        // DNSChoiceSaveData choiceData = (DNSChoiceSaveData) edge.output.userData;
+
+                        // choiceData.NodeID = nextNode.Id;
+                        
+                        choiceSaveData.Add(new DNSChoiceSaveData()
+                        {
+                            Text = "Output",
+                            NodeID = nextNode.Id
+                        });
+                        
+                    }
+                }
+                node.Choices = choiceSaveData;
+            }
+            return node;
+        }
+
+        public virtual void UploadSaveData(DNode node)
+        {
+            Id = node.Id;
+            Text = node.Text;
+            Choices = node.Choices;
+        }
+        
+        public void DisconnectAllPorts()
+        {
+            DisconnectInputPorts();
+            DisconnectOutputPorts();
+        }
+
+        private void DisconnectInputPorts()
+        {
+            DisconnectPorts(inputContainer);
+        }
+
+        private void DisconnectOutputPorts()
+        {
+            DisconnectPorts(outputContainer);
+        }
+
+        private void DisconnectPorts(VisualElement container)
+        {
+            foreach (Port port in container.Children())
+            {
+                if (!port.connected)
+                {
+                    continue;
+                }
+                graphView.DeleteElements(port.connections);
+            }
         }
     }
 }

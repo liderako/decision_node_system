@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DecisionNS.Data.Error;
+using DecisionNS.Data.Save;
 using DecisionNS.Elements;
 using DecisionNS.Enumerations;
 using DecisionNS.Utilities;
@@ -73,13 +74,16 @@ namespace DecisionNS
             this.AddManipulator(new ContentDragger());
         }
 
-        public DNSNode CreateNode(DNSTypes decisionType, Vector2 position)
+        public DNSNode CreateNode(DNSTypes decisionType, Vector2 position, bool drawMode=true)
         {
             Type type = Type.GetType($"DecisionNS.Elements.DNS{decisionType}Node");
 
             DNSNode node = (DNSNode)Activator.CreateInstance(type);
             node.Initialize(node.GetHashCode(), position, this);
-            node.Draw();
+            if (drawMode)
+            {
+                node.Draw();   
+            }
 
             AddUngroupedNode(node);
             
@@ -103,33 +107,51 @@ namespace DecisionNS
             if (searchWindow == null)
             {
                 searchWindow = ScriptableObject.CreateInstance<DNSSearchWindow>();
-                searchWindow.Initialize(this);
             }
+            
+            searchWindow.Initialize(this);
 
-            nodeCreationRequest = context => SearchWindow.Open(new SearchWindowContext(GetLocalMousePosition(context.screenMousePosition)), searchWindow);
+            // nodeCreationRequest = context => Debug.Log("CLICK");
+
+            nodeCreationRequest = context => SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindow);
         }
 
         private void OnElementsDeleted()
         {
+            Type edgeType = typeof(Edge);
+            
             deleteSelection = (operationName, askUser) =>
             {
                 List<DNSNode> nodesToDelete = new List<DNSNode>();
+                List<Edge> edgesToDelete = new List<Edge>();
+                
                 foreach (GraphElement element in selection)
                 {
                     if (element is DNSNode)
                     {
                         nodesToDelete.Add((DNSNode)element);
+                        continue;
+                    }
+                    
+                    if (element.GetType() == edgeType)
+                    {
+                        Edge edge = (Edge) element;
+                        edgesToDelete.Add(edge);
+                        continue;
                     }
                 }
+                
+                DeleteElements(edgesToDelete);
 
                 for (int i = 0; i < nodesToDelete.Count; i++)
                 {
                     RemoveUngroupedNode(nodesToDelete[i]);
+                    nodesToDelete[i].DisconnectAllPorts();
                     RemoveElement(nodesToDelete[i]);
                 }
             };
         }
-        
+
         public void AddUngroupedNode(DNSNode node)
         {
             Int64 id = node.Id;
@@ -187,10 +209,29 @@ namespace DecisionNS
             {
                 worldMousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, mousePosition - editorWindow.position.position);
             }
+            
+            return contentViewContainer.WorldToLocal(worldMousePosition);
+        }
 
-            Vector2 localMousePosition = contentViewContainer.WorldToLocal(worldMousePosition);
-
-            return localMousePosition;
+        public List<DNode> GetNodesForSave()
+        {
+            List<DNode> nodes = new List<DNode>();
+            graphElements.ForEach(graphElement =>
+            {
+                if (graphElement is DNSNode node)
+                {
+                    nodes.Add(node.GetSaveData());
+                }
+            });
+            return nodes;   
+        }
+        
+        public void ClearGraph()
+        {
+            graphElements.ForEach(graphElement => RemoveElement(graphElement));
+            
+            ungroupsNodes.Clear();
+            IndexError = 0;
         }
     }
 }

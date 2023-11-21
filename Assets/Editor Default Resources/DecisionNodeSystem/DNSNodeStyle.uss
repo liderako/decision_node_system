@@ -18,6 +18,23 @@
     padding: var(--dns-metrics-window-pixels-8);
 }
 
+.dns-node__single-decision-container
+{
+    background-color: var(--dns-colors-window-dark-grey-1);
+    padding: 16px;
+    margin-top: 20px;
+}
+
+.dns-node__element_in_single_node
+{
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
+.dns_node_toggle > .unity-toggle__label
+{
+}
+
 /* INPUTS */
 
 .dns-node__textfield > .unity-text-field__input

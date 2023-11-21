@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8921cfb9184f40e9b24c3bbc16dd8840, type: 3}
+  m_Name: 2
+  m_EditorClassIdentifier: 
+  Nodes:
+  - rid: 6490190030749827270
+  - rid: 6490190030749827271
+  - rid: 6490190030749827272
+  - rid: 6490190030749827273
+  - rid: 6490190030749827274
+  - rid: 6490190030749827275
+  references:
+    version: 2
+    RefIds:
+    - rid: 6490190030749827270
+      type: {class: SingleDNode, ns: DecisionNS.Data.Save, asm: Assembly-CSharp}
+      data:
+        <Id>k__BackingField: 2
+        <Choices>k__BackingField:
+        - <Text>k__BackingField: Output
+          <NodeID>k__BackingField: 4
+        <Text>k__BackingField: 2
+        <Type>k__BackingField: 0
+        <Position>k__BackingField: {x: 998, y: 345}
+        <IsNPC>k__BackingField: 0
+        <NodeItem>k__BackingField: {fileID: 0}
+    - rid: 6490190030749827271
+      type: {class: SingleDNode, ns: DecisionNS.Data.Save, asm: Assembly-CSharp}
+      data:
+        <Id>k__BackingField: 4
+        <Choices>k__BackingField:
+        - <Text>k__BackingField: Output
+          <NodeID>k__BackingField: 5
+        <Text>k__BackingField: 3
+        <Type>k__BackingField: 0
+        <Position>k__BackingField: {x: 1583, y: 357}
+        <IsNPC>k__BackingField: 0
+        <NodeItem>k__BackingField: {fileID: 11400000, guid: 78eb61fd45b6f6f4e83345c1bacc7e2a, type: 2}
+    - rid: 6490190030749827272
+      type: {class: SingleDNode, ns: DecisionNS.Data.Save, asm: Assembly-CSharp}
+      data:
+        <Id>k__BackingField: 3
+        <Choices>k__BackingField:
+        - <Text>k__BackingField: Output
+          <NodeID>k__BackingField: 4
+        <Text>k__BackingField: hello world mazafaka
+        <Type>k__BackingField: 0
+        <Position>k__BackingField: {x: 962, y: 749}
+        <IsNPC>k__BackingField: 0
+        <NodeItem>k__BackingField: {fileID: 11400000, guid: 373b8c35076aeea4db0787db5c7901f5, type: 2}
+    - rid: 6490190030749827273
+      type: {class: SingleDNode, ns: DecisionNS.Data.Save, asm: Assembly-CSharp}
+      data:
+        <Id>k__BackingField: 5
+        <Choices>k__BackingField:
+        - <Text>k__BackingField: Output
+          <NodeID>k__BackingField: 6
+        <Text>k__BackingField: 3
+        <Type>k__BackingField: 0
+        <Position>k__BackingField: {x: 2321, y: 949}
+        <IsNPC>k__BackingField: 0
+        <NodeItem>k__BackingField: {fileID: 0}
+    - rid: 6490190030749827274
+      type: {class: SingleDNode, ns: DecisionNS.Data.Save, asm: Assembly-CSharp}
+      data:
+        <Id>k__BackingField: 1
+        <Choices>k__BackingField:
+        - <Text>k__BackingField: Output
+          <NodeID>k__BackingField: 2
+        - <Text>k__BackingField: Output
+          <NodeID>k__BackingField: 3
+        <Text>k__BackingField: 1
+        <Type>k__BackingField: 0
+        <Position>k__BackingField: {x: 319, y: 416}
+        <IsNPC>k__BackingField: 0
+        <NodeItem>k__BackingField: {fileID: 0}
+    - rid: 6490190030749827275
+      type: {class: SingleDNode, ns: DecisionNS.Data.Save, asm: Assembly-CSharp}
+      data:
+        <Id>k__BackingField: 6
+        <Choices>k__BackingField: []
+        <Text>k__BackingField: 
+        <Type>k__BackingField: 0
+        <Position>k__BackingField: {x: 2853, y: 1394}
+        <IsNPC>k__BackingField: 0
+        <NodeItem>k__BackingField: {fileID: 0}
