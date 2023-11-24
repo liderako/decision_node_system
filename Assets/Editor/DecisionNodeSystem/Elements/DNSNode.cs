@@ -1,31 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using DecisionNS.Data.Save;
+using DecisionNS.Editor.DecisionNodeSystem.Data.ScriptableObjects;
 using DecisionNS.Utilities;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using DecisionNS.Data;
+using DecisionNS.Enums;
 
 namespace DecisionNS.Elements
 {
-    using Enumerations;
-    
     public abstract class DNSNode : Node
     {
         public Int64 Id { get; set; }
         public string NodeName { get; set; }
-
-        public string Text;
         
-        public List<DNSChoiceSaveData> Choices { get; set; }
+        public List<DNSPortLink> PortLink { get; set; }
         public DNSTypes Type { get; set; }
 
         protected DNSGraphView graphView;
         
         private StyleColor originBackgroundColor;
         protected VisualElement CustomDataContainer { get; set; }
-
-        protected TextField textArea;
 
 
         public virtual void Initialize(int id, Vector2 position, DNSGraphView graph)
@@ -36,7 +32,7 @@ namespace DecisionNS.Elements
             graphView = graph;
             
             NodeName = "BaseNode";
-            Choices = new List<DNSChoiceSaveData>();
+            PortLink = new List<DNSPortLink>();
 
             SetPosition(new Rect(position, Vector2.zero));
             
@@ -86,17 +82,6 @@ namespace DecisionNS.Elements
             CustomDataContainer = new VisualElement();
             CustomDataContainer.AddToClassList("dns-node__custom-data-container");
 
-            Foldout textFoldout = new Foldout().CreateFoldout("Decision Text");
-
-            textArea = new TextField().CreateTextArea("Decision text");
-            textArea.AddToClassList("dns-node__textfield");
-            textArea.AddToClassList("dns-node__filename-textfield");
-            textArea.AddToClassList("dns-node__textfield__hidden");
-            textArea.value = Text;
-
-            textFoldout.Add(textArea);
-            CustomDataContainer.Add(textFoldout);
-
             extensionContainer.Add(CustomDataContainer);
         }
         
@@ -115,32 +100,26 @@ namespace DecisionNS.Elements
             if (node == null)
             {
                 node = new DNode();
-                node.Fill(Id, Type, textArea.value, GetPosition().position);
-                // node.Choices = Choices;
+                node.Fill(Id, Type, GetPosition().position);
             }
             else
             {
-                node.Fill(Id, Type, textArea.value, GetPosition().position);
-                List<DNSChoiceSaveData> choiceSaveData = new List<DNSChoiceSaveData>();
+                node.Fill(Id, Type, GetPosition().position);
+                List<DNSPortLink> choiceSaveData = new List<DNSPortLink>();
                 foreach (Port port in outputContainer.Children())
                 {
                     foreach (var edge in port.connections)
                     {
                         DNSNode nextNode = (DNSNode) edge.input.node;
 
-                        // DNSChoiceSaveData choiceData = (DNSChoiceSaveData) edge.output.userData;
-
-                        // choiceData.NodeID = nextNode.Id;
-                        
-                        choiceSaveData.Add(new DNSChoiceSaveData()
+                        choiceSaveData.Add(new DNSPortLink()
                         {
-                            Text = "Output",
                             NodeID = nextNode.Id
                         });
                         
                     }
                 }
-                node.Choices = choiceSaveData;
+                node.Port = choiceSaveData;
             }
             return node;
         }
@@ -148,24 +127,13 @@ namespace DecisionNS.Elements
         public virtual void UploadSaveData(DNode node)
         {
             Id = node.Id;
-            Text = node.Text;
-            Choices = node.Choices;
+            PortLink = node.Port;
         }
         
         public void DisconnectAllPorts()
         {
-            DisconnectInputPorts();
-            DisconnectOutputPorts();
-        }
-
-        private void DisconnectInputPorts()
-        {
-            DisconnectPorts(inputContainer);
-        }
-
-        private void DisconnectOutputPorts()
-        {
             DisconnectPorts(outputContainer);
+            DisconnectPorts(inputContainer);
         }
 
         private void DisconnectPorts(VisualElement container)

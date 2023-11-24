@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ec30ddc39a434a80929b426c62cedf18, type: 3}
-  m_Name: hello world mazafaka
+  m_Name: dialogue_item
   m_EditorClassIdentifier: 
-  id: hello world mazafaka
-  text: hello world mazafaka
+  id: 
+  text: 

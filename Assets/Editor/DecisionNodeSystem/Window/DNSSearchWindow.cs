@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DecisionNS.Enumerations;
+using DecisionNS.Enums;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 

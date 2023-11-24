@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using DecisionNS.Data.Save;
+﻿using System;
+using System.Collections.Generic;
+using DecisionNS.Data;
 using UnityEngine;
 
 namespace DecisionNS.Editor.DecisionNodeSystem.Data.ScriptableObjects
@@ -8,5 +9,11 @@ namespace DecisionNS.Editor.DecisionNodeSystem.Data.ScriptableObjects
     public class DNSContainer : ScriptableObject
     {
         [SerializeReference] public List<DNode> Nodes;
+    }
+    
+    [Serializable]
+    public class DNSPortLink
+    {
+        [field: SerializeField] public long NodeID { get; set; }
     }
 }

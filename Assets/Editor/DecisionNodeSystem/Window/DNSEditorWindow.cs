@@ -5,6 +5,7 @@ using DecisionNS.Utilities;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+using DecisionNS.Data;
 
 namespace DecisionNS.Windows
 {
@@ -17,6 +18,7 @@ namespace DecisionNS.Windows
         private TextField fileNameTextField;
 
         public DNSContainer dnsContainer;
+        public DNSContainer originContainer;
 
         [MenuItem("Window/DecisionNS/Decision Graph")]
         public static void ShowExample()
@@ -31,6 +33,7 @@ namespace DecisionNS.Windows
             copyContainer.name = dnsContainerInput.name;
             w.LoadGraph(copyContainer);
             w.dnsContainer = copyContainer;
+            w.originContainer = dnsContainerInput;
         }
 
         private void OnEnable()
@@ -115,12 +118,19 @@ namespace DecisionNS.Windows
 
         private void SaveGraph()
         {
-            if (string.IsNullOrEmpty(fileNameTextField.value))
+            if (originContainer == null)
             {
-                EditorUtility.DisplayDialog("Invalid file name.", "Please ensure the file name you've typed in is valid.", "Fine!");
-                return;
+                if (string.IsNullOrEmpty(fileNameTextField.value))
+                {
+                    EditorUtility.DisplayDialog("Invalid file name.", "Please ensure the file name you've typed in is valid.", "Fine!");
+                    return;
+                }
+                mementoGraph.Save(fileNameTextField.value, graphView.GetNodesForSave());
             }
-            mementoGraph.Save(fileNameTextField.value, graphView.GetNodesForSave());
+            else
+            {
+                mementoGraph.Save(fileNameTextField.value, graphView.GetNodesForSave(), originContainer);   
+            }
         }
 
         private void LoadGraph(DNSContainer container=null)
@@ -142,7 +152,7 @@ namespace DecisionNS.Windows
             }
             graphView.ClearGraph();
             mementoGraph = new MementoGraph(graphView, fileName);
-            if (mementoGraph.Load())
+            if (mementoGraph.Load(container))
             {
                 fileNameTextField.value = fileName;
             }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DecisionNS.Data.Save;
+using DecisionNS.Data;
 using DecisionNS.Editor.DecisionNodeSystem.Data.ScriptableObjects;
 using DecisionNS.Elements;
 using DecisionNS.Windows;
@@ -24,12 +24,20 @@ namespace DecisionNS.Editor.Memento
             graphFileName = graphName;   
         }
 
-        public void Save(string graphFileName, List<DNode> nodes)
+        public void Save(string graphFileName, List<DNode> nodes, DNSContainer dnsContainer = null)
         {
             CreateDefaultFolders();
-            DNSContainer graphData = CreateAsset<DNSContainer>("Assets/Resources/DecisionGraphs/", $"{graphFileName}");
-            graphData.Nodes = nodes;
-            SaveAsset(graphData);
+            if (dnsContainer == null)
+            {
+                DNSContainer graphData = CreateAsset<DNSContainer>("Assets/Resources/DecisionGraphs/", $"{graphFileName}");
+                graphData.Nodes = nodes;
+                SaveAsset(graphData);
+            }
+            else
+            {
+                dnsContainer.Nodes = nodes;
+                SaveAsset(dnsContainer);
+            }
         }
         
         private void SaveAsset(UnityEngine.Object asset)
@@ -117,9 +125,9 @@ namespace DecisionNS.Editor.Memento
             foreach (KeyValuePair<long, (DNode, DNSNode)> loadedNode in loadedNodes)
             {
                 Port output = (Port) loadedNode.Value.Item2.outputContainer.Children().First();
-                for (int i = 0; i < loadedNode.Value.Item1.Choices.Count; i++)
+                for (int i = 0; i < loadedNode.Value.Item1.Port.Count; i++)
                 {
-                    DNSNode nextNode = loadedNodes[loadedNode.Value.Item1.Choices[i].NodeID].Item2;
+                    DNSNode nextNode = loadedNodes[loadedNode.Value.Item1.Port[i].NodeID].Item2;
                     Port input = (Port) nextNode.inputContainer.Children().First();
                     
                     Edge edge = output.ConnectTo(input);

@@ -1,6 +1,7 @@
 ﻿using System;
-using DecisionNS.Data.Save;
+using DecisionNS.Data;
 using DecisionNS.Editor.DecisionNodeSystem.Data.ScriptableObjects;
+using DecisionNS.Enums;
 using DecisionNS.Utilities;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
@@ -10,15 +11,16 @@ using Object = UnityEngine.Object;
 
 namespace DecisionNS.Elements
 {
-    using Enumerations;
-    
     public class DNSDecisionNode : DNSNode
     {
-        public bool isNpc { get; set; }
-        public ScriptableObject nodeItem { get; set; }
-
+        private bool isNpc { get; set; }
+        private ScriptableObject nodeItem { get; set; }
+        private string text;
+        
+        // UIelements
         private ObjectField scriptableObjectField;
-        private Toggle IsNPC;
+        private Toggle IsNPCToggle;
+        private TextField textArea;
 
         public override void Initialize(int id, Vector2 position, DNSGraphView graph)
         {
@@ -28,7 +30,7 @@ namespace DecisionNS.Elements
             
             Type = DNSTypes.Decision;
             
-            Choices.Add(new DNSChoiceSaveData() { Text = "Output" });
+            PortLink.Add(new DNSPortLink());
         }
 
         public override void Draw()
@@ -46,8 +48,24 @@ namespace DecisionNS.Elements
             outputContainer.Add(choicePort);
         }
 
+        private void SetupTextArea()
+        {
+            Foldout textFoldout = new Foldout().CreateFoldout("Decision Text");
+
+            textArea = new TextField().CreateTextArea("Decision text");
+            textArea.AddToClassList("dns-node__textfield");
+            textArea.AddToClassList("dns-node__filename-textfield");
+            textArea.AddToClassList("dns-node__textfield__hidden");
+            textArea.value = text;
+
+            textFoldout.Add(textArea);
+            CustomDataContainer.Add(textFoldout);   
+        }
+
         private void CustomDataContainerSetup()
         {
+            SetupTextArea();
+            
             VisualElement visualElement = new VisualElement();
             visualElement = new VisualElement();
             visualElement.AddToClassList("dns-node__single-decision-container");
@@ -60,22 +78,22 @@ namespace DecisionNS.Elements
             };
             scriptableObjectField.RegisterCallback<ChangeEvent<Object>>((evt) =>
             {
-                if (evt.newValue is DialogueConfig)
+                if (evt.newValue is DialogueItem)
                 {
-                    textArea.value = ((DialogueConfig)evt.newValue).text;
+                    textArea.value = ((DialogueItem)evt.newValue).text;
                 }
                 nodeItem = (ScriptableObject)evt.newValue;
             });
             scriptableObjectField.AddToClassList("dns-node__element_in_single_node");
             
-            IsNPC = new Toggle();
-            IsNPC.label = "IS NPC";
-            IsNPC.value = isNpc;
-            IsNPC.AddToClassList("dns-node__element_in_single_node");
-            IsNPC.AddToClassList("dns_node_toggle");
+            IsNPCToggle = new Toggle();
+            IsNPCToggle.label = "IS NPC";
+            IsNPCToggle.value = isNpc;
+            IsNPCToggle.AddToClassList("dns-node__element_in_single_node");
+            IsNPCToggle.AddToClassList("dns_node_toggle");
             
             visualElement.Add(scriptableObjectField);
-            visualElement.Add(IsNPC);
+            visualElement.Add(IsNPCToggle);
 
             CustomDataContainer.Add(visualElement);
         }
@@ -87,13 +105,13 @@ namespace DecisionNS.Elements
             {
                 SingleDNode singleDNode = new SingleDNode();
                 base.GetSaveData(singleDNode);
-                singleDNode.Fill(isNpc, nodeItem);
+                singleDNode.Fill(isNpc, nodeItem, textArea.value);
                 return singleDNode;
             }
             if (dNode is SingleDNode)
             {
                 var a = (SingleDNode)dNode;
-                a.Fill(isNpc, nodeItem);
+                a.Fill(isNpc, nodeItem, textArea.value);
                 return dNode;
             }
             throw new Exception("Wrong type");
@@ -109,6 +127,7 @@ namespace DecisionNS.Elements
             SingleDNode n = (SingleDNode)node;
             isNpc = n.IsNPC;
             nodeItem = n.NodeItem;
+            text = n.Text;
         }
     }
 }

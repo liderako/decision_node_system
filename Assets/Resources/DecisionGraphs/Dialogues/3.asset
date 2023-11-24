@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8921cfb9184f40e9b24c3bbc16dd8840, type: 3}
-  m_Name: 2
+  m_Name: 3
   m_EditorClassIdentifier: 
   Nodes:
-  - rid: 6490190103508680716
-  - rid: 6490190103508680717
-  - rid: 6490190103508680718
+  - rid: 6490190103508680719
+  - rid: 6490190103508680720
+  - rid: 6490190103508680721
+  - rid: 6490190103508680722
   references:
     version: 2
     RefIds:
-    - rid: 6490190103508680716
+    - rid: 6490190103508680719
       type: {class: SingleDNode, ns: DecisionNS.Data, asm: Assembly-CSharp}
       data:
         <Id>k__BackingField: -90737152
@@ -31,23 +32,34 @@ MonoBehaviour:
         <IsNPC>k__BackingField: 0
         <NodeItem>k__BackingField: {fileID: 11400000, guid: 235a80a50c00445489e018001e5c8ab1, type: 2}
         <Text>k__BackingField: 
-    - rid: 6490190103508680717
+    - rid: 6490190103508680720
       type: {class: SingleDNode, ns: DecisionNS.Data, asm: Assembly-CSharp}
       data:
         <Id>k__BackingField: 1320915536
-        <Port>k__BackingField: []
+        <Port>k__BackingField:
+        - <NodeID>k__BackingField: 1296452688
         <Type>k__BackingField: 0
         <Position>k__BackingField: {x: 1128, y: 332}
         <IsNPC>k__BackingField: 0
         <NodeItem>k__BackingField: {fileID: 11400000, guid: 235a80a50c00445489e018001e5c8ab1, type: 2}
         <Text>k__BackingField: 
-    - rid: 6490190103508680718
+    - rid: 6490190103508680721
       type: {class: SingleDNode, ns: DecisionNS.Data, asm: Assembly-CSharp}
       data:
         <Id>k__BackingField: 1747787856
         <Port>k__BackingField: []
         <Type>k__BackingField: 0
         <Position>k__BackingField: {x: 692, y: 548}
+        <IsNPC>k__BackingField: 0
+        <NodeItem>k__BackingField: {fileID: 0}
+        <Text>k__BackingField: 
+    - rid: 6490190103508680722
+      type: {class: SingleDNode, ns: DecisionNS.Data, asm: Assembly-CSharp}
+      data:
+        <Id>k__BackingField: 1296452688
+        <Port>k__BackingField: []
+        <Type>k__BackingField: 0
+        <Position>k__BackingField: {x: 2031, y: 304}
         <IsNPC>k__BackingField: 0
         <NodeItem>k__BackingField: {fileID: 0}
         <Text>k__BackingField: 

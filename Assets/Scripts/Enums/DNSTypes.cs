@@ -1,4 +1,4 @@
-﻿namespace DecisionNS.Enumerations
+﻿namespace DecisionNS.Enums
 {
     public enum DNSTypes
     {
