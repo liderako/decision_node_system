@@ -11,6 +11,16 @@
     background-color: var(--dns-colors-window-dark-grey-1);
 }
 
+.dns-node-event__main-container
+{
+    background-color: #22709b;
+}
+
+.dns_node_event__object_field
+{
+    margin: 8px;
+}
+
 .dns-node__custom-data-container
 {
     background-color: var(--dns-colors-window-dark-grey-3);

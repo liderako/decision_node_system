@@ -16,12 +16,13 @@ namespace DecisionNS.Editor.Memento
     {
         private DNSGraphView graphView;
         private string graphFileName;
+        public string graphFilePath;
         private DNSEditorWindow dnsEditorWindow;
 
         public MementoGraph(DNSGraphView graphView, string graphName)
         {
             this.graphView = graphView;
-            graphFileName = graphName;   
+            graphFileName = graphName;
         }
 
         public void Save(string graphFileName, List<DNode> nodes, DNSContainer dnsContainer = null)
@@ -70,6 +71,11 @@ namespace DecisionNS.Editor.Memento
 
             return AssetDatabase.LoadAssetAtPath<T>(fullPath);
         }
+        
+        private T LoadAsset<T>(string path) where T : ScriptableObject
+        {
+            return AssetDatabase.LoadAssetAtPath<T>(path);
+        }
 
         private void CreateDefaultFolders()
         {
@@ -85,24 +91,52 @@ namespace DecisionNS.Editor.Memento
             }
             AssetDatabase.CreateFolder(parentFolderPath, newFolderName);
         }
+        
+        private static string TrimToAssetsFolder(string absolutePath)
+        {
+            int index = absolutePath.IndexOf("Assets");
+            if (index != -1)
+            {
+                return absolutePath.Substring(index);
+            }
+            else
+            {
+                Debug.LogError("Path does not contain 'Assets' folder.");
+                return absolutePath;
+            }
+        }
 
-        public bool Load(DNSContainer graphData=null)
+        public bool Load(out DNSContainer graphData)
+        {
+            if (graphFilePath != null)
+            {
+                Debug.Log(graphFilePath);
+                graphData = LoadAsset<DNSContainer>(TrimToAssetsFolder(graphFilePath));   
+            }
+            else
+            {
+                graphData = LoadAsset<DNSContainer>("Assets/Resources/DecisionGraphs/", $"{graphFileName}");
+            }
+            if (graphData == null)
+            {
+                EditorUtility.DisplayDialog(
+                    "Could not find the file!",
+                    "The file at the following path could not be found:\n\n" +
+                    $"\"Assets/Resources/DecisionGraphs/{graphFileName}\".\n\n" +
+                    "Make sure you chose the right file and it's placed at the folder path mentioned above.",
+                    "Thanks!"
+                );
+                return false;
+            }
+            LoadNodes(graphData.Nodes);
+            return true;
+        }
+
+        public bool Load(DNSContainer graphData)
         {
             if (graphData == null)
             {
-                graphData = LoadAsset<DNSContainer>("Assets/Resources/DecisionGraphs/", $"{graphFileName}");
-
-                if (graphData == null)
-                {
-                    EditorUtility.DisplayDialog(
-                        "Could not find the file!",
-                        "The file at the following path could not be found:\n\n" +
-                        $"\"Assets/Resources/DecisionGraphs/{graphFileName}\".\n\n" +
-                        "Make sure you chose the right file and it's placed at the folder path mentioned above.",
-                        "Thanks!"
-                    );
-                    return false;
-                }   
+                return false;
             }
             LoadNodes(graphData.Nodes);
             return true;

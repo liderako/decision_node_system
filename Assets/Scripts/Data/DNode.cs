@@ -36,4 +36,10 @@ namespace DecisionNS.Data
             this.Text = Text;
         }
     }
+
+    [System.Serializable]
+    public class EventNode : DNode
+    {
+        [field:SerializeField] public List<DNSEventItem> EventItems { get; set; }
+    }
 }

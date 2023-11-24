@@ -112,7 +112,7 @@ namespace DecisionNS.Elements
             {
                 var a = (SingleDNode)dNode;
                 a.Fill(isNpc, nodeItem, textArea.value);
-                return dNode;
+                return a;
             }
             throw new Exception("Wrong type");
         }

@@ -24,10 +24,15 @@ namespace DecisionNS.Windows
             {
                 new SearchTreeGroupEntry(new GUIContent("Create Element")),
                 new SearchTreeGroupEntry(new GUIContent("Decision Node"), 1),
-                new SearchTreeEntry(new GUIContent("Single Decision", indentationIcon))
+                new SearchTreeEntry(new GUIContent("Decision Node", indentationIcon))
                 {
                     level = 2,
                     userData = DNSTypes.Decision
+                },
+                new SearchTreeEntry(new GUIContent("Event Node", indentationIcon))
+                {
+                    level = 2,
+                    userData = DNSTypes.Event
                 },
             };
                 
@@ -44,6 +49,13 @@ namespace DecisionNS.Windows
                     graphView.AddElement(graphView.CreateNode(
                         DNSTypes.Decision,
                        position:localMousePosition));
+                    return true;
+                }
+                case DNSTypes.Event:
+                {
+                    graphView.AddElement(graphView.CreateNode(
+                        DNSTypes.Event,
+                        position:localMousePosition));
                     return true;
                 }
             }

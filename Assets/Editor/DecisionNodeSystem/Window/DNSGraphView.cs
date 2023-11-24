@@ -24,6 +24,22 @@ namespace DecisionNS
 
         public OnValueIndexError onValueIndexError;
 
+        public void IncreaseIndexError()
+        {
+            IndexError++;
+            onValueIndexError(IndexError);
+        }
+
+        public void DecreaseIndexError()
+        {
+            IndexError--;
+            if (IndexError <= 0)
+            {
+                IndexError = 0;
+            }
+            onValueIndexError(IndexError);  
+        }
+
         public DNSGraphView(DNSEditorWindow editorWindow)
         {
             this.editorWindow = editorWindow;
@@ -170,9 +186,8 @@ namespace DecisionNS
             if (ungroupsNodes[id].Nodes.Count >= 2)
             {
                 ungroupsNodes[id].Nodes[0].SetErrorStyle(DNSErrorData.Color);
-                IndexError++;
+                IncreaseIndexError();
             }
-            onValueIndexError(IndexError);
         }
         
         public void RemoveUngroupedNode(DNSNode n)
@@ -185,20 +200,19 @@ namespace DecisionNS
                 if (ungroupsNodes[n.Id].Nodes.Count >= 1)
                 {
                     ungroupsNodes[n.Id].Nodes[0].ResetStyle();
-                    IndexError--;
+                    DecreaseIndexError();
                 }
 
                 if (ungroupsNodes[n.Id].Nodes.Count == 0)
                 {
                     ungroupsNodes.Remove(n.Id);
                 }
-                
-                if (IndexError <= 0)
-                {
-                    IndexError = 0;
-                }
-                onValueIndexError(IndexError);
             }
+        }
+
+        public bool IsCanSave()
+        {
+            return false;
         }
         
         public Vector2 GetLocalMousePosition(Vector2 mousePosition, bool isSearchWindow = false)

@@ -5,7 +5,6 @@ using DecisionNS.Utilities;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using DecisionNS.Data;
 
 namespace DecisionNS.Windows
 {
@@ -31,7 +30,7 @@ namespace DecisionNS.Windows
             var w = GetWindow<DNSEditorWindow>("Decision Graph");
             var copyContainer = Instantiate(dnsContainerInput);
             copyContainer.name = dnsContainerInput.name;
-            w.LoadGraph(copyContainer);
+            w.LoadGraphByContainer(copyContainer);
             w.dnsContainer = copyContainer;
             w.originContainer = dnsContainerInput;
         }
@@ -74,7 +73,7 @@ namespace DecisionNS.Windows
             {
                 if (dnsContainer != null)
                 {
-                    LoadGraph(dnsContainer);
+                    LoadGraphByContainer(dnsContainer);
                 }
             })
             {
@@ -133,23 +132,26 @@ namespace DecisionNS.Windows
             }
         }
 
-        private void LoadGraph(DNSContainer container=null)
+        private void LoadGraph()
         {
-            string fileName;
-            if (container == null)
+            string filePath = EditorUtility.OpenFilePanel("Dialogue Graphs", "Assets/", "asset");
+            if (string.IsNullOrEmpty(filePath))
             {
-                string filePath = EditorUtility.OpenFilePanel("Dialogue Graphs", "Assets/", "asset");
+                return;
+            }
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            graphView.ClearGraph();
+            mementoGraph = new MementoGraph(graphView, fileName);
+            mementoGraph.graphFilePath = filePath;
+            if (mementoGraph.Load(out originContainer))
+            {
+                fileNameTextField.value = fileName;
+            }
+        }
 
-                if (string.IsNullOrEmpty(filePath))
-                {
-                    return;
-                }
-                fileName = Path.GetFileNameWithoutExtension(filePath);
-            }
-            else
-            {
-                fileName = container.name;
-            }
+        private void LoadGraphByContainer(DNSContainer container)
+        {
+            string fileName = container.name;
             graphView.ClearGraph();
             mementoGraph = new MementoGraph(graphView, fileName);
             if (mementoGraph.Load(container))
