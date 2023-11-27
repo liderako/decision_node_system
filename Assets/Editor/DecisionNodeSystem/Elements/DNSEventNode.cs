@@ -111,7 +111,7 @@ namespace DecisionNS.Elements
 
         private ObjectField CreateEventField(DNSEventItem obj)
         {
-            ObjectField field = new ObjectField("Event Item")
+            ObjectField field = new ObjectField()
             {
                 objectType = typeof(DNSEventItem),
                 allowSceneObjects = false,

@@ -21,6 +21,9 @@
     background-color: #3f1f62;
 }
 
+.dns-node__object_field {
+}
+
 .dns_node_event__object_field
 {
     margin: 8px;

@@ -16,8 +16,7 @@ namespace DecisionNS.Elements
     public class DNSConditionNode : DNSNode, IErrorNodeComponent
     {
         private List<DNSConditionItem> nodeItems { get; set; }
-        private List<ObjectField> scriptableObjectField;
-        
+        private List<(ObjectField, Toggle)> scriptableObjectField;
         public ErrorNodeComponent ErrorNodeComponent { get; set; }
 
         public override void Initialize(int id, Vector2 position, DNSGraphView graph)
@@ -54,17 +53,17 @@ namespace DecisionNS.Elements
             {
                 ErrorNodeComponent.ActivateErrorNode();
                 
-                ObjectField field = CreateField(null);
-                field.AddToClassList("dns_node_event__object_field");
+                var field = CreateField(null);
+                field.Item1.AddToClassList("dns_node_event__object_field");
                 scriptableObjectField.Add(field);
-                CustomDataContainer.Add(field);
-                ErrorNodeComponent.RegisterFieldCallBack(field);
+                CustomDataContainer.Add(field.Item1);
+                ErrorNodeComponent.RegisterFieldCallBack(field.Item1);
             }).Setup(title:"Add Condition Item");
             addFieldButton.AddToClassList("dns_node__button");
             extensionContainer.Insert(0, addFieldButton);
         }
         
-        private void DeleteButton(ObjectField visualElement)
+        private void DeleteButton(ObjectField visualElement, Toggle bToggle)
         {
             Button deleteFieldButton = new Button((() =>
             {
@@ -76,7 +75,7 @@ namespace DecisionNS.Elements
                 {
                     ErrorNodeComponent.DeactivateErrorNode();
                 }
-                scriptableObjectField.Remove(visualElement);
+                scriptableObjectField.Remove((visualElement, bToggle));
                 CustomDataContainer.Remove(visualElement);
             })).Setup(title:"Delete");
             deleteFieldButton.AddToClassList("dns_node__button");
@@ -90,31 +89,40 @@ namespace DecisionNS.Elements
                 nodeItems = new List<DNSConditionItem>();
                 nodeItems.Add(null);
             }
-            scriptableObjectField = new List<ObjectField>();
+            scriptableObjectField = new List<(ObjectField, Toggle)>();
             
             foreach (var eventNodeData in nodeItems)
             {
-                ObjectField field = CreateField(eventNodeData);
-                if (field.value == null)
+                var field = CreateField(eventNodeData);
+                if (field.Item1.value == null)
                 {
                     ErrorNodeComponent.ActivateErrorNode();
                 }
-                ErrorNodeComponent.RegisterFieldCallBack(field);
+                ErrorNodeComponent.RegisterFieldCallBack(field.Item1);
                 scriptableObjectField.Add(field);
-                CustomDataContainer.Add(field);
+                CustomDataContainer.Add(field.Item1);
             }
         }
 
-        private ObjectField CreateField(DNSConditionItem obj)
+        private (ObjectField, Toggle) CreateField(DNSConditionItem obj)
         {
-            ObjectField field = new ObjectField("Condition Item")
+            ObjectField field = new ObjectField()
             {
                 objectType = typeof(DNSConditionItem),
                 allowSceneObjects = false,
                 value = obj
             };
-            DeleteButton(field);
-            return field;
+
+            field.AddToClassList("dns-node__object_field");
+
+            Toggle statusToggle = new Toggle();
+            statusToggle.value = obj == null ? false : obj.Status;
+
+            field.Insert(0, statusToggle);
+            
+            DeleteButton(field, statusToggle);
+            
+            return (field, statusToggle);
         }
         
         public override DNode GetSaveData(DNode dNode=null)
@@ -140,7 +148,9 @@ namespace DecisionNS.Elements
             List<DNSConditionItem> nodes = new List<DNSConditionItem>();
             foreach (var field in scriptableObjectField)
             {
-                nodes.Add((DNSConditionItem)field.value);
+                DNSConditionItem value = (DNSConditionItem)field.Item1.value;
+                value.Status = field.Item2.value;
+                nodes.Add(value);
             }
             return nodes;
         }
