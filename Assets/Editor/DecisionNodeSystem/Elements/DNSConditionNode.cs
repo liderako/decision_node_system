@@ -13,28 +13,28 @@ using UnityEngine.UIElements;
 
 namespace DecisionNS.Elements
 {
-    public class DNSEventNode : DNSNode, IErrorNodeComponent
+    public class DNSConditionNode : DNSNode, IErrorNodeComponent
     {
-        private List<DNSEventItem> nodeItems { get; set; }
+        private List<DNSConditionItem> nodeItems { get; set; }
         private List<ObjectField> scriptableObjectField;
-
+        
         public ErrorNodeComponent ErrorNodeComponent { get; set; }
 
         public override void Initialize(int id, Vector2 position, DNSGraphView graph)
         {
             base.Initialize(id, position, graph);
-            ErrorNodeComponent = new ErrorNodeComponent(this);
-            NodeName = "Event Node";
-            Type = DNSTypes.Event;
+            NodeName = "Condition Node";
+            Type = DNSTypes.Condition;
             PortLink.Add(new DNSPortLink());
+            ErrorNodeComponent = new ErrorNodeComponent(this);
         }
-
+        
         public override void Draw()
         {
             base.Draw();
             
             mainContainer.ClearClassList();
-            mainContainer.AddToClassList("dns-node-event__main-container");
+            mainContainer.AddToClassList("dns-node-condition__main-container");
 
             OutputContainerSetup();
             DrawObjectFields();
@@ -47,25 +47,23 @@ namespace DecisionNS.Elements
             Port choicePort =  this.CreateOutput(Port.Capacity.Single, name:"Output");
             outputContainer.Add(choicePort);
         }
-
+        
         private void AddButton()
         {
             Button addFieldButton = new Button(() =>
             {
                 ErrorNodeComponent.ActivateErrorNode();
                 
-                ObjectField field = CreateEventField(null);
+                ObjectField field = CreateField(null);
                 field.AddToClassList("dns_node_event__object_field");
                 scriptableObjectField.Add(field);
                 CustomDataContainer.Add(field);
                 ErrorNodeComponent.RegisterFieldCallBack(field);
-
-            }).Setup(title:"Add Event Item");
+            }).Setup(title:"Add Condition Item");
             addFieldButton.AddToClassList("dns_node__button");
             extensionContainer.Insert(0, addFieldButton);
         }
-
-
+        
         private void DeleteButton(ObjectField visualElement)
         {
             Button deleteFieldButton = new Button((() =>
@@ -81,24 +79,22 @@ namespace DecisionNS.Elements
                 scriptableObjectField.Remove(visualElement);
                 CustomDataContainer.Remove(visualElement);
             })).Setup(title:"Delete");
-            
             deleteFieldButton.AddToClassList("dns_node__button");
-            
             visualElement.Add(deleteFieldButton);
         }
-
+        
         private void DrawObjectFields()
         {
             if (nodeItems == null)
             {
-                nodeItems = new List<DNSEventItem>();
+                nodeItems = new List<DNSConditionItem>();
                 nodeItems.Add(null);
             }
             scriptableObjectField = new List<ObjectField>();
             
             foreach (var eventNodeData in nodeItems)
             {
-                ObjectField field = CreateEventField(eventNodeData);
+                ObjectField field = CreateField(eventNodeData);
                 if (field.value == null)
                 {
                     ErrorNodeComponent.ActivateErrorNode();
@@ -109,11 +105,11 @@ namespace DecisionNS.Elements
             }
         }
 
-        private ObjectField CreateEventField(DNSEventItem obj)
+        private ObjectField CreateField(DNSConditionItem obj)
         {
-            ObjectField field = new ObjectField("Event Item")
+            ObjectField field = new ObjectField("Condition Item")
             {
-                objectType = typeof(DNSEventItem),
+                objectType = typeof(DNSConditionItem),
                 allowSceneObjects = false,
                 value = obj
             };
@@ -125,39 +121,40 @@ namespace DecisionNS.Elements
         {
             if (dNode == null)
             {
-                EventNode eventNode = new EventNode();
-                base.GetSaveData(eventNode);
-                eventNode.EventItems = GetNodes();
-                return eventNode;
+                ConditionNode conditionNode = new ConditionNode();
+                base.GetSaveData(conditionNode);
+                conditionNode.ConditionItems = GetNodes();
+                return conditionNode;
             }
-            if (dNode is EventNode)
+            if (dNode is ConditionNode)
             {
-                var a = (EventNode)dNode;
-                a.EventItems = GetNodes();
+                var a = (ConditionNode)dNode;
+                a.ConditionItems = GetNodes();
                 return a;
             }
             throw new Exception("Wrong type");
         }
 
-        private List<DNSEventItem> GetNodes()
+        private List<DNSConditionItem> GetNodes()
         {
-            List<DNSEventItem> nodes = new List<DNSEventItem>();
+            List<DNSConditionItem> nodes = new List<DNSConditionItem>();
             foreach (var field in scriptableObjectField)
             {
-                nodes.Add((DNSEventItem)field.value);
+                nodes.Add((DNSConditionItem)field.value);
             }
             return nodes;
         }
 
         public override void UploadSaveData(DNode node)
         {
-            if (node is not EventNode)
+            if (node is not ConditionNode)
             {
                 throw new Exception("Wrong type: EventDNode");
             }
             base.UploadSaveData(node);
-            EventNode n = (EventNode)node;
-            nodeItems = n.EventItems;
+            ConditionNode n = (ConditionNode)node;
+            nodeItems = n.ConditionItems;
         }
+
     }
 }

@@ -4,6 +4,6 @@ namespace DecisionNS.Editor.DecisionNodeSystem.Data.ScriptableObjects
 {
     public class BaseConfig : ScriptableObject
     {
-        public string id;
+        public string ID => this.name;
     }
 }

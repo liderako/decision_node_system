@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DecisionNS.Data.Error;
 using DecisionNS.Data;
 using DecisionNS.Elements;
+using DecisionNS.Elements.Interfaces;
 using DecisionNS.Enums;
 using DecisionNS.Utilities;
 using DecisionNS.Windows;
@@ -83,7 +84,7 @@ namespace DecisionNS
 
         private void AddManipulators()
         {
-            SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
+            SetupZoom(ContentZoomer.DefaultMinScale / 2, ContentZoomer.DefaultMaxScale * 2);
             
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
@@ -145,7 +146,14 @@ namespace DecisionNS
                 {
                     if (element is DNSNode)
                     {
-                        nodesToDelete.Add((DNSNode)element);
+                        DNSNode dnsNode = (DNSNode)element;
+                        nodesToDelete.Add(dnsNode);
+
+                        if (dnsNode is IErrorNodeComponent)
+                        {
+                            ((IErrorNodeComponent)dnsNode).ErrorNodeComponent.ResetAllErrors();
+                        }
+                        
                         continue;
                     }
                     

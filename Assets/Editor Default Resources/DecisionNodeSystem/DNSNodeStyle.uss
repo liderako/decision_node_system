@@ -3,7 +3,7 @@
 .dns-node__extension-container
 {
     background-color: var(--dns-colors-window-dark-grey-1);
-    padding: var(--dns-metrics-window-pixels-8);
+    padding: 8px;
 }
 
 .dns-node__main-container
@@ -13,7 +13,12 @@
 
 .dns-node-event__main-container
 {
-    background-color: #22709b;
+    background-color: #1b4a65;
+}
+
+.dns-node-condition__main-container
+{
+    background-color: #3f1f62;
 }
 
 .dns_node_event__object_field
@@ -24,8 +29,8 @@
 .dns-node__custom-data-container
 {
     background-color: var(--dns-colors-window-dark-grey-3);
-    border-radius: var(--dns-metrics-window-pixels-4);
-    padding: var(--dns-metrics-window-pixels-8);
+    border-radius: 4px;
+    padding: 8px;
 }
 
 .dns-node__single-decision-container
@@ -51,10 +56,11 @@
 {
     background-color: var(--dns-colors-window-dark-grey-1);
     border-color: var(--dns-colors-window-dark-grey-6);
-    border-radius: var(--dns-metrics-window-pixels-4);
-    max-width: var(--dns-metrics-window-pixels-240);
-    min-width: var(--dns-metrics-window-pixels-160);
-    padding: var(--dns-metrics-window-pixels-8);
+    border-radius: 4px;
+    max-width: 240px;
+    min-width: 160px;
+    padding: 8px;
+    font-size: 16px;
     white-space: normal;
     -unity-text-align: middle-center;
 }
@@ -80,24 +86,24 @@
 
 .dns-node__filename-textfield > .unity-text-field__input
 {
-    max-width: var(--dns-metrics-window-pixels-1000);
-    margin: var(--dns-metrics-window-pixels-4);
-    padding: var(--dns-metrics-window-pixels-4);
+    max-width: 250px;
+    margin: 4px;
+    padding: 4px;
 }
 
 .dns-node__choice-textfield > .unity-text-field__input
 {
-    font-size: var(--dns-metrics-window-pixels-11);
-    height: var(--dns-metrics-window-pixels-35);
-    max-width: var(--dns-metrics-window-pixels-1000);
+    font-size: 11px;
+    height: 35px;
+    max-width: 250px;
     min-width: 100px;
 }
 
 .dns-node__choice-textfield > .unity-text-field__input:focus
 {
-    height: var(--dns-metrics-window-pixels-25);
-    margin: var(--dns-metrics-window-pixels-4);
-    padding: var(--dns-metrics-window-pixels-4);
+    height: 25px;
+    margin: 4px;
+    padding: 4px;
 }
 
 .dns-node__quote-textfield > .unity-text-field__input
@@ -105,9 +111,9 @@
     background-color: var(--dns-colors-window-dark-grey-4);
     border-color: transparent;
     border-left-color: var(--dns-colors-window-dark-grey-6);
-    border-left-width: var(--dns-metrics-window-pixels-4);
-    padding: var(--dns-metrics-window-pixels-16);
-    max-width: var(--dns-metrics-window-pixels-600);
+    border-left-width: 4px;
+    padding: 16px;
+    max-width: 350px;
 }
 
 .dns-node__quote-textfield > .unity-text-field__input:hover
@@ -127,8 +133,8 @@
 {
     background-color: var(--dns-colors-window-dark-grey-5);
     border-color: var(--dns-colors-window-dark-grey-1);
-    margin: var(--dns-metrics-window-pixels-4);
-    max-height: var(--dns-metrics-window-pixels-25);
+    margin: 4px;
+    max-height: 25px;
 }
 
 .dns-node__button:hover
@@ -146,24 +152,24 @@
 
 TextField
 {
-    margin-left: var(--dns-metrics-window-pixels-0);
+    margin-left: 0px;
 }
 
 .dns-node__custom-data-container > Foldout
 {
-    margin-left: var(--dns-metrics-window-pixels-n4);
-    margin-top: var(--dns-metrics-window-pixels-4);
+    margin-left: -4px;
+    margin-top: -4px;
 }
 
 .dns-node__custom-data-container > Foldout > TextField
 {
-    margin-left: var(--dns-metrics-window-pixels-n12);
-    margin-top: var(--dns-metrics-window-pixels-8);
+    margin-left: -12px;
+    margin-top: 8px;
 }
 
 /* BUILT IN */
 
 .unity-toggle__text
 {
-    margin-left: var(--dns-metrics-window-pixels-2);
+    margin-left: 2px;
 }

@@ -34,6 +34,11 @@ namespace DecisionNS.Windows
                     level = 2,
                     userData = DNSTypes.Event
                 },
+                new SearchTreeEntry(new GUIContent("Condition Node", indentationIcon))
+                {
+                    level = 2,
+                    userData = DNSTypes.Condition
+                },
             };
                 
             return searchTreeEntries;
@@ -55,6 +60,13 @@ namespace DecisionNS.Windows
                 {
                     graphView.AddElement(graphView.CreateNode(
                         DNSTypes.Event,
+                        position:localMousePosition));
+                    return true;
+                }
+                case DNSTypes.Condition:
+                {
+                    graphView.AddElement(graphView.CreateNode(
+                        DNSTypes.Condition,
                         position:localMousePosition));
                     return true;
                 }

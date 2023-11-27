@@ -3,7 +3,6 @@
     public enum DNSTypes
     {
         Decision,
-        MultipleChoice,
         Event,
         Condition
     }

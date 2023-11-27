@@ -11,21 +11,5 @@
     --dns-colors-window-dark-grey-6: #27292C;
     --dns-colors-window-yellow: #FDD057;
 
-    --dns-metrics-grid-25: 25;
-    --dns-metrics-window-pixels-n12: -12px;
-    --dns-metrics-window-pixels-n4: -4px;
-    --dns-metrics-window-pixels-0: 0px;
-    --dns-metrics-window-pixels-2: 2px;
-    --dns-metrics-window-pixels-4: 4px;
-    --dns-metrics-window-pixels-6: 6px;
-    --dns-metrics-window-pixels-8: 8px;
-    --dns-metrics-window-pixels-11: 11px;
-    --dns-metrics-window-pixels-16: 16px;
-    --dns-metrics-window-pixels-25: 25px;
-    --dns-metrics-window-pixels-35: 35px;
-    --dns-metrics-window-pixels-120: 120px;
-    --dns-metrics-window-pixels-160: 160px;
-    --dns-metrics-window-pixels-240: 240px;
-    --dns-metrics-window-pixels-600: 600px;
-    --dns-metrics-window-pixels-1000: 1000px;
+    --dns-metrics-grid-25: 32;
 }

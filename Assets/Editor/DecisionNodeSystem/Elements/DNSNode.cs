@@ -14,15 +14,13 @@ namespace DecisionNS.Elements
     {
         public Int64 Id { get; set; }
         public string NodeName { get; set; }
-        
         public List<DNSPortLink> PortLink { get; set; }
         public DNSTypes Type { get; set; }
 
-        protected DNSGraphView graphView;
+        public DNSGraphView graphView { get; private set; }
         
         private StyleColor originBackgroundColor;
         protected VisualElement CustomDataContainer { get; set; }
-
 
         public virtual void Initialize(int id, Vector2 position, DNSGraphView graph)
         {

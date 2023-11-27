@@ -42,4 +42,10 @@ namespace DecisionNS.Data
     {
         [field:SerializeField] public List<DNSEventItem> EventItems { get; set; }
     }
+    
+    [System.Serializable]
+    public class ConditionNode : DNode
+    {
+        [field:SerializeField] public List<DNSConditionItem> ConditionItems { get; set; }
+    }
 }
